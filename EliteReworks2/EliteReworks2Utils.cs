@@ -33,7 +33,7 @@ namespace EliteReworks2
             return toReturn;
         }
 
-        public static int BuffSphere(BuffDef buff, float buffDuration, Vector3 position, float radius, TeamIndex teamIndex)
+        public static int BuffSphere(BuffDef buff, TeamIndex teamIndex, Vector3 position, float radius, float buffDuration, bool shouldTargetEnemies)
         {
             int hitCount = 0;
 
@@ -42,7 +42,7 @@ namespace EliteReworks2
             foreach (CharacterBody body in CharacterBody.instancesList)
             {
                 if (!body) continue;
-                if (body.teamComponent && body.teamComponent.teamIndex != teamIndex) continue;
+                if (body.teamComponent && (shouldTargetEnemies ? body.teamComponent.teamIndex == teamIndex : body.teamComponent.teamIndex != teamIndex)) continue;
 
                 float distanceSqr = (body.corePosition - position).sqrMagnitude;
                 if (distanceSqr > radiusSqr) continue;
@@ -54,7 +54,7 @@ namespace EliteReworks2
             return hitCount;
         }
 
-        public static void DebuffSphere(BuffIndex buff, TeamIndex team, Vector3 position, float radius, float debuffDuration, GameObject effect, GameObject hitEffect, bool ignoreImmunity, bool falloff, NetworkSoundEventDef buffSound)
+        public static void DebuffSphereOverlap(BuffIndex buff, TeamIndex team, Vector3 position, float radius, float debuffDuration, GameObject effect, GameObject hitEffect, bool ignoreImmunity, bool falloff, NetworkSoundEventDef buffSound)
         {
             if (!NetworkServer.active)
             {

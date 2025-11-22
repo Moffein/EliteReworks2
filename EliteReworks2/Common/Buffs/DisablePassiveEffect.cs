@@ -20,6 +20,7 @@ namespace EliteReworks2.Common.Buffs
             buffDef.isDOT = false;
             buffDef.isCooldown = false;
             buffDef.ignoreGrowthNectar = true;
+            buffDef.canStack = false;
             buffDef.flags = BuffDef.Flags.ExcludeFromNoxiousThorns;
             (buffDef as ScriptableObject).name = "MoffeinEliteReworks_DisablePassiveEffect";
             PluginContentPack.buffDefs.Add(buffDef);

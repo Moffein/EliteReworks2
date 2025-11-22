@@ -410,7 +410,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Elites\Malachite\" />
     <Folder Include="Elites\Celestine\" />
     <Folder Include="Elites\Twisted\" />
   </ItemGroup>

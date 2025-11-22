@@ -90,7 +90,7 @@ namespace EliteReworks2.Elites.Glacial
             if (!attackerBody || !attackerBody.HasBuff(RoR2Content.Buffs.AffixWhite) || !attackerBody.teamComponent) return;
 
             float slowDuration = 1f + damageInfo.procCoefficient * 2f;
-            EliteReworks2Utils.DebuffSphere(ModCompat.zetAspectsLoaded ? Assets.Buffs.Slow80Alt.buffIndex : RoR2Content.Buffs.Slow80.buffIndex, attackerBody.teamComponent.teamIndex,
+            EliteReworks2Utils.DebuffSphereOverlap(ModCompat.zetAspectsLoaded ? Assets.Buffs.Slow80Alt.buffIndex : RoR2Content.Buffs.Slow80.buffIndex, attackerBody.teamComponent.teamIndex,
                                 damageInfo.position, 4f, slowDuration,
                                 Assets.Effects.GlacialOnHitExplosion, null, false, true, Assets.NetworkSoundEvents.SlowApplied);
         }
@@ -132,6 +132,7 @@ namespace EliteReworks2.Elites.Glacial
                 buffDef.isCooldown = false;
                 buffDef.iconSprite = orig.iconSprite;
                 buffDef.buffColor = orig.buffColor;
+                buffDef.canStack = false;
                 (buffDef as ScriptableObject).name = "MoffeinEliteReworks_Slow80Alt";
                 PluginContentPack.buffDefs.Add(buffDef);
                 Buffs.Slow80Alt = buffDef;
