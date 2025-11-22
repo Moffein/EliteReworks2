@@ -26,7 +26,7 @@ namespace EliteReworks2
     public class EliteReworks2Plugin : BaseUnityPlugin
     {
         public const string pluginGUID = "com.Moffein.EliteReworks2";
-        public const string pluginName = "EliteReworks 2";
+        public const string pluginName = "EliteReworks2";
 
         public static PluginInfo info;
         internal void Awake()
