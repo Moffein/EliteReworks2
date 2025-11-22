@@ -413,7 +413,6 @@
     <Folder Include="Elites\Malachite\" />
     <Folder Include="Elites\Celestine\" />
     <Folder Include="Elites\Twisted\" />
-    <Folder Include="Elites\Voidtouched\" />
   </ItemGroup>
 
 </Project>

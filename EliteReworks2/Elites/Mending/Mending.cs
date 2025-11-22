@@ -3,6 +3,7 @@ using RoR2;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 
@@ -36,7 +37,16 @@ namespace EliteReworks2.Elites.Mending
         {
             base.ApplyChanges();
             ModifyStats();
+            FixHealCore();
             On.RoR2.AffixEarthBehavior.FixedUpdate += AffixEarthBehavior_FixedUpdate;
+        }
+
+        private void FixHealCore()
+        {
+            GameObject healCore = Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/EliteEarth/AffixEarthHealerBody.prefab").WaitForCompletion();
+            CharacterBody body = healCore.GetComponent<CharacterBody>();
+            body.levelMaxHealth = body.baseMaxHealth * 0.3f;
+            body.levelDamage = body.baseDamage * 0.2f;
         }
 
         private void AffixEarthBehavior_FixedUpdate(On.RoR2.AffixEarthBehavior.orig_FixedUpdate orig, AffixEarthBehavior self)
