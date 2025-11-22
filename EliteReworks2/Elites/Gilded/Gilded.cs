@@ -28,8 +28,9 @@ namespace EliteReworks2.Elites.Gilded
         public static bool directSiphon;
         public static bool onlyKnockoutGoldFromPlayers;
 
-        public static float passiveDamage = 24f;    //Lemurian
-        public static float passiveDamageBoss = 32f;    //Imp Overlord
+        public static float playerDamageCoefficient = 2f;
+        public static float passiveDamage = 24f;    //T1 Elite Lemurian
+        public static float passiveDamageBoss = 32f;    //T1 Elite Imp Overlord
 
         protected override void ReadConfig(ConfigFile config)
         {
@@ -101,6 +102,10 @@ namespace EliteReworks2.Elites.Gilded
                 c.Emit(OpCodes.Ldarg_2);    //Body
                 c.EmitDelegate<Func<float, CharacterBody, float>>((damage, body) =>
                 {
+                    if (body.isPlayerControlled || (body.teamComponent && body.teamComponent.teamIndex == TeamIndex.Player))
+                    {
+                        return body.damage * playerDamageCoefficient;
+                    }
                     return EliteReworks2Utils.GetAmbientLevelScaledDamage(body.isChampion ? passiveDamageBoss : passiveDamage);
                 });
 
@@ -109,6 +114,10 @@ namespace EliteReworks2.Elites.Gilded
                     c.Emit(OpCodes.Ldarg_2);    //Body
                     c.EmitDelegate<Func<float, CharacterBody, float>>((damage, body) =>
                     {
+                        if (body.isPlayerControlled || (body.teamComponent && body.teamComponent.teamIndex == TeamIndex.Player))
+                        {
+                            return body.damage * playerDamageCoefficient;
+                        }
                         return EliteReworks2Utils.GetAmbientLevelScaledDamage(body.isChampion ? passiveDamageBoss : passiveDamage);
                     });
                     error = false;

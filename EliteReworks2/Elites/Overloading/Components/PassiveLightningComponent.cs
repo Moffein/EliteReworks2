@@ -8,6 +8,7 @@ namespace EliteReworks2.Elites.Overloading.Components
     {
         public float lightingDelay = 6f;
 
+        public float playerDamageCoefficient = 3f;
         public float flatDamageNPC = 36f;
         public float flatDamageNPCBoss = 57.6f; //+60% damage, mimics Imp Overlord vs Imp
 
@@ -53,6 +54,10 @@ namespace EliteReworks2.Elites.Overloading.Components
             if (!characterBody.hasEffectiveAuthority) return;
 
             float damage = characterBody.isChampion ? EliteReworks2Utils.GetAmbientLevelScaledDamage(flatDamageNPCBoss) : EliteReworks2Utils.GetAmbientLevelScaledDamage(flatDamageNPC);
+            if (characterBody.isPlayerControlled || (characterBody.teamComponent && characterBody.teamComponent.teamIndex == TeamIndex.Player))
+            {
+                damage = characterBody.damage * playerDamageCoefficient;
+            }
 
             FireMeatballs(gameObject, characterBody.isChampion, damage, characterBody.RollCrit(),
                 Vector3.up, characterBody.corePosition + Vector3.up, characterBody.transform.forward,

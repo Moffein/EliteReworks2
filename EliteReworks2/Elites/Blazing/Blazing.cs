@@ -13,8 +13,9 @@ namespace EliteReworks2.Elites.Blazing
 
         public override string ConfigDescriptionString => "Enable changes related to Blazing Elites.";
 
-        public static float fireTrailDamage = 24f;  //Lemurian
-        public static float fireTrailDamageBoss = 32f;  //Imp Overlord
+        public static float fireTrailDamage = 36f;  //Vanilla Blazing Lemurian (12 x 2 x 1.5)
+        public static float fireTrailDamageBoss = 48f;  //Vanilla Blazing Imp Overlord (16 x 2 x 1.5)
+        public static float playerDamageCoefficient = 3f;   //2 x 1.5
 
         public static float healthBoostCoefficient;
         public static float damageBoostCoefficient;
@@ -67,13 +68,20 @@ namespace EliteReworks2.Elites.Blazing
 
             if (self.fireTrail)
             {
-                if (self.isChampion)
+                if (self.isPlayerControlled || (self.teamComponent && self.teamComponent.teamIndex == TeamIndex.Player))
                 {
-                    self.fireTrail.damagePerSecond = EliteReworks2Utils.GetAmbientLevelScaledDamage(fireTrailDamageBoss) * 1.5f;
+                    self.fireTrail.damagePerSecond = self.damage * playerDamageCoefficient;
                 }
                 else
                 {
-                    self.fireTrail.damagePerSecond = EliteReworks2Utils.GetAmbientLevelScaledDamage(fireTrailDamage) * 1.5f;
+                    if (self.isChampion)
+                    {
+                        self.fireTrail.damagePerSecond = EliteReworks2Utils.GetAmbientLevelScaledDamage(fireTrailDamageBoss);
+                    }
+                    else
+                    {
+                        self.fireTrail.damagePerSecond = EliteReworks2Utils.GetAmbientLevelScaledDamage(fireTrailDamage);
+                    }
                 }
             }
         }

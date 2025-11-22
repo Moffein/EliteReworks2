@@ -20,6 +20,7 @@ namespace EliteReworks2.Elites.Malachite
 
         public override string ConfigDescriptionString => "Enable changes related to Malachite Elites.";
 
+        public static float playerDamageCoefficient = 4f;
         public static float spikeDamage = 48f;
         public static float spikeDamageBoss = 64f;
 
@@ -84,6 +85,10 @@ namespace EliteReworks2.Elites.Malachite
                 {
                     Vector3 forward = Quaternion.AngleAxis(num2 * (float)i, up) * point;
                     float damage = EliteReworks2Utils.GetAmbientLevelScaledDamage(self.isChampion ? spikeDamageBoss : spikeDamage);
+                    if (self.isPlayerControlled || (self.teamComponent && self.teamComponent.teamIndex == TeamIndex.Player))
+                    {
+                        damage = self.damage * playerDamageCoefficient;
+                    }
                     
                     ProjectileManager.instance.FireProjectile(Assets.Projectiles.MalachiteOrbModded, self.corePosition, Util.QuaternionSafeLookRotation(forward), self.gameObject, damage, 0f, self.RollCrit(), DamageColorIndex.Default, null, -1f);
                 }

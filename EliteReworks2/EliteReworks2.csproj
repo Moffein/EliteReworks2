@@ -411,7 +411,6 @@
 
   <ItemGroup>
     <Folder Include="Elites\Celestine\" />
-    <Folder Include="Elites\Twisted\" />
   </ItemGroup>
 
 </Project>
