@@ -122,7 +122,10 @@ namespace EliteReworks2.Elites.Voidtouched
                             {
                                 //Enemies need to scale
                                 float ambientDamageStat = EliteReworks2Utils.GetAmbientLevelScaledDamage(attackerBody.isChampion ? collapseBossBodyDamageBase : collapseBodyDamageBase);
-                                return damageMult * (ambientDamageStat / attackerBody.damage);
+                                if (attackerBody.damage > ambientDamageStat)
+                                {
+                                    return damageMult * (ambientDamageStat / attackerBody.damage);
+                                }
                             }
                         }
                     }
