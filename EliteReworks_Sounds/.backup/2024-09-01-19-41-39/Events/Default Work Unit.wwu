@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{E7F52691-3EC0-4EB1-9A70-26A31FDFA3DC}" SchemaVersion="97">
+	<Events>
+		<WorkUnit Name="Default Work Unit" ID="{E7F52691-3EC0-4EB1-9A70-26A31FDFA3DC}" PersistMode="Standalone">
+			<ChildrenList>
+				<Event Name="Play_EliteReworks_Lightning" ID="{5AD05ED8-382A-4B0B-A8EC-FBD3444FD7CD}">
+					<ChildrenList>
+						<Action Name="" ID="{3BA3A90F-DA3B-4D55-B57D-43670DA92CF2}" ShortID="1059713930">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="wChainLightning" ID="{7CA42FDC-583D-442F-AE2C-FDEBD3F2241D}" WorkUnitID="{203EBEDD-1655-4A26-906D-BFB287F17EA1}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+			</ChildrenList>
+		</WorkUnit>
+	</Events>
+</WwiseDocument>

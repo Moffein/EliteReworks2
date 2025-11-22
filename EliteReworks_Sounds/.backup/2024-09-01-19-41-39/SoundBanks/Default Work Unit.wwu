@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{2EE4C61D-6A95-41F5-9FF9-769486FEBF6F}" SchemaVersion="97">
+	<SoundBanks>
+		<WorkUnit Name="Default Work Unit" ID="{2EE4C61D-6A95-41F5-9FF9-769486FEBF6F}" PersistMode="Standalone">
+			<ChildrenList>
+				<SoundBank Name="EliteReworks" ID="{36C9E5A4-8A9E-456E-830C-8E1000B39E04}">
+					<ObjectInclusionList>
+						<ObjectRef Name="Play_EliteReworks_Lightning" ID="{5AD05ED8-382A-4B0B-A8EC-FBD3444FD7CD}" WorkUnitID="{E7F52691-3EC0-4EB1-9A70-26A31FDFA3DC}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
+					<ObjectExclusionList/>
+					<GameSyncExclusionList/>
+				</SoundBank>
+			</ChildrenList>
+		</WorkUnit>
+	</SoundBanks>
+</WwiseDocument>
