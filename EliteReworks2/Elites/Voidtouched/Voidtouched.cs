@@ -104,34 +104,30 @@ namespace EliteReworks2.Elites.Voidtouched
             if (c.TryGotoNext(x => x.MatchLdsfld(typeof(DLC1Content.Buffs), "EliteVoid"))
                 && c.TryGotoNext(MoveType.After, x => x.MatchLdcR4(1f)))
             {
-                c.Emit(OpCodes.Ldarg_2);//victim
                 c.Emit(OpCodes.Ldarg_1);//damageInfo
-                c.EmitDelegate<Func<float, GameObject, DamageInfo, float>>((damageMult, victim, damageInfo) =>
+                c.EmitDelegate<Func<float, DamageInfo, float>>((damageMult, damageInfo) =>
                 {
-                    //Normalize damage if attacker has ambientlevel and victim does not
-                    if (damageInfo.attacker && victim)
+                    //Normalize damage for NPCs
+                    if (damageInfo.attacker)
                     {
                         CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
-                        bool attackerAmbient = attackerBody
-                            && !attackerBody.isPlayerControlled
-                            && (attackerBody.bodyFlags.HasFlag(CharacterBody.BodyFlags.UsesAmbientLevel)
-                                || (attackerBody.inventory && attackerBody.inventory.GetItemCountEffective(RoR2Content.Items.UseAmbientLevel) > 0));
-
-                        CharacterBody victimBody = victim.GetComponent<CharacterBody>();
-                        bool victimIsNotAmbient = !(victimBody
-                            && !victimBody.isPlayerControlled
-                            && (victimBody.bodyFlags.HasFlag(CharacterBody.BodyFlags.UsesAmbientLevel)
-                                || (victimBody.inventory && victimBody.inventory.GetItemCountEffective(RoR2Content.Items.UseAmbientLevel) > 0)));
-
-                        if (attackerAmbient && victimIsNotAmbient)
+                        if (attackerBody)
                         {
-                            float ambientDamageStat = EliteReworks2Utils.GetAmbientLevelScaledDamage(attackerBody.isChampion ? collapseBossBodyDamageBase : collapseBodyDamageBase);
-                            if (attackerBody.damage > ambientDamageStat)
+                            if (attackerBody.isPlayerControlled || (attackerBody.teamComponent && attackerBody.teamComponent.teamIndex == TeamIndex.Player))
                             {
-                                damageMult *= ambientDamageStat / attackerBody.damage;
+                                //Players just use the raw value
+                                return damageMult;
+                            }
+                            else
+                            {
+                                //Enemies need to scale
+                                float ambientDamageStat = EliteReworks2Utils.GetAmbientLevelScaledDamage(attackerBody.isChampion ? collapseBossBodyDamageBase : collapseBodyDamageBase);
+                                return damageMult * (ambientDamageStat / attackerBody.damage);
                             }
                         }
                     }
+
+                    //If no attacker, DoTController will just make it do 0 damage
                     return damageMult;
                 });
             }
