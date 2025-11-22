@@ -60,6 +60,7 @@ namespace EliteReworks2.Elites.Twisted
 
             aba.fireDelay = 1.5f;   //vanilla is 2f
             aba.cooldownAfterFiring = 6f;   //vanilla is 10f
+            aba.maxAllies = 10; //vanilla is 5
         }
 
         private void NormalizeDamage(MonoMod.Cil.ILContext il)
