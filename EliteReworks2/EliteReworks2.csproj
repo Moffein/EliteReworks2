@@ -409,8 +409,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Elites\Celestine\Components\" />
-  </ItemGroup>
-
 </Project>
