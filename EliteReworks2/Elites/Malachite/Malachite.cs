@@ -250,7 +250,15 @@ namespace EliteReworks2.Elites.Malachite
                 if (NetworkObjects.AntiHealAuraIndicator) return;
 
                 GameObject indicator = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/NearbyDamageBonus/NearbyDamageBonusIndicator.prefab").WaitForCompletion().InstantiateClone("MoffeinEliteReworks_PoisonIndicator", true);
-                indicator.transform.localScale = AntiHealAuraServer.wardRadius / 12.8f * Vector3.one;
+                indicator.transform.localScale = AntiHealAuraServer.wardRadius / 13f * Vector3.one;
+
+                Material elitePoisonIndicator = Addressables.LoadAssetAsync<Material>("RoR2/Base/ElitePoison/matElitePoisonAreaIndicator.mat").WaitForCompletion();
+                MeshRenderer[] renderers = indicator.GetComponentsInChildren<MeshRenderer>();
+                foreach (MeshRenderer mesh in renderers)
+                {
+                    mesh.material = elitePoisonIndicator;
+                }
+
                 PrefabAPI.RegisterNetworkPrefab(indicator);
 
                 NetworkObjects.AntiHealAuraIndicator = indicator;

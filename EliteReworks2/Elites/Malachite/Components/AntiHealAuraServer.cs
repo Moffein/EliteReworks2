@@ -6,7 +6,7 @@ namespace EliteReworks2.Elites.Malachite.Components
 {
     public class AntiHealAuraServer : MonoBehaviour
     {
-        public static float wardRadius = 22f;
+        public static float wardRadius = 25f;
         public static float refreshTime = 2.5f / 5f;  //2.5 seconds divided by 5 stacks for full buildup
         public static float buffDuration = 1f;
 
