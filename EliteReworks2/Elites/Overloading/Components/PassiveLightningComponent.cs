@@ -34,7 +34,7 @@ namespace EliteReworks2.Elites.Overloading.Components
                 return;
             }
 
-            if (characterBody.HasBuff(Common.Buffs.DisablePassiveEffect.buffDef))
+            if (characterBody.HasBuff(Common.Buffs.DisablePassiveEffect))
             {
                 timer = 0f;
             }

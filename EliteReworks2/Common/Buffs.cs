@@ -3,18 +3,23 @@ using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace EliteReworks2.Common.Buffs
+namespace EliteReworks2.Common
 {
-    //Elite passives check if the body has this buff, and voluntarily disable themselves if this is the case.
-    public class DisablePassiveEffect
+    public static class Buffs
     {
-        public static BuffDef buffDef;
+        public static BuffDef DisablePassiveEffect;
 
         internal static void Init()
         {
-            if (buffDef) return;
+            CreateDisablePassiveEffect();
+        }
 
-            buffDef = ScriptableObject.CreateInstance<BuffDef>();
+        #region DisablePassiveEffect setup
+        private static void CreateDisablePassiveEffect()
+        {
+            if (DisablePassiveEffect) return;
+
+            BuffDef buffDef = ScriptableObject.CreateInstance<BuffDef>();
             buffDef.isDebuff = false;
             buffDef.isHidden = true;
             buffDef.isDOT = false;
@@ -24,6 +29,7 @@ namespace EliteReworks2.Common.Buffs
             buffDef.flags = BuffDef.Flags.ExcludeFromNoxiousThorns;
             (buffDef as ScriptableObject).name = "MoffeinEliteReworks_DisablePassiveEffect";
             PluginContentPack.buffDefs.Add(buffDef);
+            DisablePassiveEffect = buffDef;
 
             On.EntityStates.StunState.OnEnter += StunState_OnEnter;
             On.EntityStates.StunState.OnExit += StunState_OnExit;
@@ -38,37 +44,37 @@ namespace EliteReworks2.Common.Buffs
         private static void StunState_OnEnter(On.EntityStates.StunState.orig_OnEnter orig, EntityStates.StunState self)
         {
             orig(self);
-            if (NetworkServer.active && self.characterBody) self.characterBody.AddBuff(buffDef);
+            if (NetworkServer.active && self.characterBody) self.characterBody.AddBuff(DisablePassiveEffect);
         }
 
         private static void StunState_OnExit(On.EntityStates.StunState.orig_OnExit orig, EntityStates.StunState self)
         {
             orig(self);
-            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(buffDef)) self.characterBody.RemoveBuff(buffDef);
+            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(DisablePassiveEffect)) self.characterBody.RemoveBuff(DisablePassiveEffect);
         }
 
         private static void ShockState_OnEnter(On.EntityStates.ShockState.orig_OnEnter orig, EntityStates.ShockState self)
         {
             orig(self);
-            if (NetworkServer.active && self.characterBody) self.characterBody.AddBuff(buffDef);
+            if (NetworkServer.active && self.characterBody) self.characterBody.AddBuff(DisablePassiveEffect);
         }
 
         private static void ShockState_OnExit(On.EntityStates.ShockState.orig_OnExit orig, EntityStates.ShockState self)
         {
             orig(self);
-            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(buffDef)) self.characterBody.RemoveBuff(buffDef);
+            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(DisablePassiveEffect)) self.characterBody.RemoveBuff(DisablePassiveEffect);
         }
 
         private static void FrozenState_OnEnter(On.EntityStates.FrozenState.orig_OnEnter orig, EntityStates.FrozenState self)
         {
             orig(self);
-            if (NetworkServer.active && self.characterBody) self.characterBody.AddBuff(buffDef);
+            if (NetworkServer.active && self.characterBody) self.characterBody.AddBuff(DisablePassiveEffect);
         }
 
         private static void FrozenState_OnExit(On.EntityStates.FrozenState.orig_OnExit orig, EntityStates.FrozenState self)
         {
             orig(self);
-            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(buffDef)) self.characterBody.RemoveBuff(buffDef);
+            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(DisablePassiveEffect)) self.characterBody.RemoveBuff(DisablePassiveEffect);
         }
 
         private static void BaggedObject_OnEnter(On.EntityStates.Drifter.Bag.BaggedObject.orig_OnEnter orig, EntityStates.Drifter.Bag.BaggedObject self)
@@ -76,17 +82,18 @@ namespace EliteReworks2.Common.Buffs
             orig(self);
             if (NetworkServer.active && self.targetBody)
             {
-                self.targetBody.AddBuff(buffDef);
+                self.targetBody.AddBuff(DisablePassiveEffect);
             }
         }
 
         private static void BaggedObject_OnExit(On.EntityStates.Drifter.Bag.BaggedObject.orig_OnExit orig, EntityStates.Drifter.Bag.BaggedObject self)
         {
             orig(self);
-            if (NetworkServer.active && self.targetBody && self.targetBody.HasBuff(buffDef))
+            if (NetworkServer.active && self.targetBody && self.targetBody.HasBuff(DisablePassiveEffect))
             {
-                self.targetBody.RemoveBuff(buffDef);
+                self.targetBody.RemoveBuff(DisablePassiveEffect);
             }
         }
+        #endregion
     }
 }

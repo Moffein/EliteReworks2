@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using EliteReworks2.Common.Buffs;
 using EliteReworks2.Elites;
 using EliteReworks2.Modules;
 using R2API.Utils;
@@ -46,7 +45,7 @@ namespace EliteReworks2
 
         private void InitContent()
         {
-            DisablePassiveEffect.Init();
+            Common.Buffs.Init();
         }
 
         private void AddToAssembly()

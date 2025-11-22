@@ -65,7 +65,7 @@ namespace EliteReworks2.Elites.Malachite
 
         private void UpdateAffixPoisonEliteReworks(On.RoR2.CharacterBody.orig_UpdateAffixPoison orig, CharacterBody self, float deltaTime)
         {
-            if (!self.itemAvailability.hasAffixPoison || self.HasBuff(Common.Buffs.DisablePassiveEffect.buffDef))
+            if (!self.itemAvailability.hasAffixPoison || self.HasBuff(Common.Buffs.DisablePassiveEffect))
             {
                 self.poisonballTimer = 0f;
                 return;

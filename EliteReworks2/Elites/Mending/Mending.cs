@@ -51,7 +51,7 @@ namespace EliteReworks2.Elites.Mending
 
         private void AffixEarthBehavior_FixedUpdate(On.RoR2.AffixEarthBehavior.orig_FixedUpdate orig, AffixEarthBehavior self)
         {
-            if (NetworkServer.active && self.body && self.body.HasBuff(Common.Buffs.DisablePassiveEffect.buffDef) && self.affixEarthAttachment)
+            if (NetworkServer.active && self.body && self.body.HasBuff(Common.Buffs.DisablePassiveEffect) && self.affixEarthAttachment)
             {
                 UnityEngine.Object.Destroy(self.affixEarthAttachment);
                 self.affixEarthAttachment = null;

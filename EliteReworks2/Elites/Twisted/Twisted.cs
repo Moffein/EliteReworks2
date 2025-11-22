@@ -1,6 +1,5 @@
 ﻿using BepInEx.Configuration;
 using EliteReworks2.Modules;
-using RoR2.Projectile;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using R2API;

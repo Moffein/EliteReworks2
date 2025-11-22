@@ -54,7 +54,7 @@ namespace EliteReworks2.Elites.Blazing
         private void ModifyFireTrail(On.RoR2.CharacterBody.orig_UpdateFireTrail orig, CharacterBody self)
         {
             //Disable on stun
-            if (self.HasBuff(EliteReworks2.Common.Buffs.DisablePassiveEffect.buffDef) || !(self.healthComponent && self.healthComponent.alive))
+            if (self.HasBuff(EliteReworks2.Common.Buffs.DisablePassiveEffect) || !(self.healthComponent && self.healthComponent.alive))
             {
                 if (self.fireTrail)
                 {

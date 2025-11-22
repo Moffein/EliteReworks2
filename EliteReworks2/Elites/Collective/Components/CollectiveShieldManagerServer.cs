@@ -36,7 +36,7 @@ namespace EliteReworks2.Elites.Collective.Components
 
             if (affixCollectiveBehavior)
             {
-                if (characterBody.HasBuff(Common.Buffs.DisablePassiveEffect.buffDef))
+                if (characterBody.HasBuff(Common.Buffs.DisablePassiveEffect))
                 {
                     if (affixCollectiveBehavior._attachmentInstance)
                     {
