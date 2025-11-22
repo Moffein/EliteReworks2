@@ -30,6 +30,8 @@ namespace EliteReworks2.Common.Buffs
             On.EntityStates.ShockState.OnExit += ShockState_OnExit;
             On.EntityStates.FrozenState.OnEnter += FrozenState_OnEnter;
             On.EntityStates.FrozenState.OnExit += FrozenState_OnExit;
+            On.EntityStates.Drifter.Bag.BaggedObject.OnEnter += BaggedObject_OnEnter;
+            On.EntityStates.Drifter.Bag.BaggedObject.OnExit += BaggedObject_OnExit;
         }
 
         private static void StunState_OnEnter(On.EntityStates.StunState.orig_OnEnter orig, EntityStates.StunState self)
@@ -66,6 +68,24 @@ namespace EliteReworks2.Common.Buffs
         {
             orig(self);
             if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(buffDef)) self.characterBody.RemoveBuff(buffDef);
+        }
+
+        private static void BaggedObject_OnEnter(On.EntityStates.Drifter.Bag.BaggedObject.orig_OnEnter orig, EntityStates.Drifter.Bag.BaggedObject self)
+        {
+            orig(self);
+            if (NetworkServer.active && self.targetBody)
+            {
+                self.targetBody.AddBuff(buffDef);
+            }
+        }
+
+        private static void BaggedObject_OnExit(On.EntityStates.Drifter.Bag.BaggedObject.orig_OnExit orig, EntityStates.Drifter.Bag.BaggedObject self)
+        {
+            orig(self);
+            if (NetworkServer.active && self.targetBody && self.targetBody.HasBuff(buffDef))
+            {
+                self.targetBody.RemoveBuff(buffDef);
+            }
         }
     }
 }
