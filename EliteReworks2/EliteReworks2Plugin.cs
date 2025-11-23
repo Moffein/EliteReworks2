@@ -40,6 +40,7 @@ namespace EliteReworks2
             }
             ModCompat.Init();
             InitContent();
+            ModifyEliteTiers.Init(Config);
             AddToAssembly();
         }
 

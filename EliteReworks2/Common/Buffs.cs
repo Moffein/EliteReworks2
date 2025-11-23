@@ -50,7 +50,11 @@ namespace EliteReworks2.Common
         private static void StunState_OnExit(On.EntityStates.StunState.orig_OnExit orig, EntityStates.StunState self)
         {
             orig(self);
-            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(DisablePassiveEffect)) self.characterBody.RemoveBuff(DisablePassiveEffect);
+            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(DisablePassiveEffect))
+            {
+                self.characterBody.RemoveBuff(DisablePassiveEffect);
+                if (!self.characterBody.HasBuff(DisablePassiveEffect)) self.characterBody.AddTimedBuff(DisablePassiveEffect, 0.5f);
+            }
         }
 
         private static void ShockState_OnEnter(On.EntityStates.ShockState.orig_OnEnter orig, EntityStates.ShockState self)
@@ -62,7 +66,11 @@ namespace EliteReworks2.Common
         private static void ShockState_OnExit(On.EntityStates.ShockState.orig_OnExit orig, EntityStates.ShockState self)
         {
             orig(self);
-            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(DisablePassiveEffect)) self.characterBody.RemoveBuff(DisablePassiveEffect);
+            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(DisablePassiveEffect))
+            {
+                self.characterBody.RemoveBuff(DisablePassiveEffect);
+                if (!self.characterBody.HasBuff(DisablePassiveEffect)) self.characterBody.AddTimedBuff(DisablePassiveEffect, 0.5f);
+            }
         }
 
         private static void FrozenState_OnEnter(On.EntityStates.FrozenState.orig_OnEnter orig, EntityStates.FrozenState self)
@@ -74,7 +82,11 @@ namespace EliteReworks2.Common
         private static void FrozenState_OnExit(On.EntityStates.FrozenState.orig_OnExit orig, EntityStates.FrozenState self)
         {
             orig(self);
-            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(DisablePassiveEffect)) self.characterBody.RemoveBuff(DisablePassiveEffect);
+            if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(DisablePassiveEffect))
+            {
+                self.characterBody.RemoveBuff(DisablePassiveEffect);
+                if (!self.characterBody.HasBuff(DisablePassiveEffect)) self.characterBody.AddTimedBuff(DisablePassiveEffect, 0.5f);
+            }
         }
 
         private static void BaggedObject_OnEnter(On.EntityStates.Drifter.Bag.BaggedObject.orig_OnEnter orig, EntityStates.Drifter.Bag.BaggedObject self)
@@ -92,6 +104,7 @@ namespace EliteReworks2.Common
             if (NetworkServer.active && self.targetBody && self.targetBody.HasBuff(DisablePassiveEffect))
             {
                 self.targetBody.RemoveBuff(DisablePassiveEffect);
+                if (!self.targetBody.HasBuff(DisablePassiveEffect)) self.targetBody.AddTimedBuff(DisablePassiveEffect, 0.5f);
             }
         }
         #endregion
