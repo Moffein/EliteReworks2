@@ -1,8 +1,11 @@
 ﻿using BepInEx.Configuration;
+using EliteReworks2.Common.Components;
 using EliteReworks2.Elites.Celestine.Components;
 using EliteReworks2.Modules;
+using HG;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using R2API;
 using RoR2;
 using System;
 using UnityEngine;
@@ -148,7 +151,7 @@ namespace EliteReworks2.Elites.Celestine
                                         ghostBody.master.inventory.GiveItemPermanent(RoR2Content.Items.BoostDamage, 5);
                                         ghostBody.master.inventory.SetEquipmentIndex(EquipmentIndex.None, true);
                                     }
-                                    ghostBody.AddBuff(Assets.Buffs.ReviveBuff);
+                                    ghostBody.AddBuff(Assets.Buffs.CelestineReviveBuff);
                                     ahr.attachedGhosts.Add(ghostBody);
                                 }
                                 break;
@@ -161,20 +164,105 @@ namespace EliteReworks2.Elites.Celestine
 
         public static class Assets
         {
+            public static class NonCatalogEffects
+            {
+                public static GameObject CelestineMarkerGreen;
+                public static GameObject CelestineMarkerRed;
+            }
+
+            public static class Effects
+            {
+                public static GameObject CelestineOrb;
+            }
+
             public static class Materials
             {
                 public static Material CelestineIndicatorNoBubble;
+                public static Material CelestineBuffMarkerMat;
+                public static Material CelestineOwnerMarkerMat;
             }
 
             public static class Buffs
             {
-                public static BuffDef ReviveBuff;
+                public static BuffDef CelestineReviveBuff;
             }
 
             internal static void Init()
             {
-                CreateReviveBuff();
                 CreateCelestineIndicatorNoBubble();
+                CreateCelestineMarkerGreenMat();
+                CreateCelestineMarkerRedMat();
+                CreateCelestineOrbEffect();
+
+                CreateCelestineMarkerGreen();
+                CreateCelestineMarkerRed();
+                CreateReviveBuff();
+                On.RoR2.CharacterBody.UpdateAllTemporaryVisualEffects += CharacterBody_UpdateAllTemporaryVisualEffects;
+            }
+
+            private static void CreateCelestineOrbEffect()
+            {
+                GameObject effect = Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/EliteHaunted/HauntOrbEffect.prefab").WaitForCompletion().InstantiateClone("MoffeinEliteReworks_CelestineOrbEffect", false);
+
+                effect.GetComponent<EffectComponent>().applyScale = true;
+                AkEvent[] events = effect.GetComponentsInChildren<AkEvent>();
+                foreach (var ev in events)
+                {
+                    UnityEngine.Object.Destroy(ev);
+                }
+                AkGameObj[] gos = effect.GetComponentsInChildren<AkGameObj>();
+                foreach (var go in gos)
+                {
+                    UnityEngine.Object.Destroy(go);
+                }
+
+                //effect.transform.Find("VFX").localScale = 0.5f * Vector3.one;
+
+                PluginContentPack.effectDefs.Add(new EffectDef(effect));
+                Effects.CelestineOrb = effect;
+            }
+
+            private static void CharacterBody_UpdateAllTemporaryVisualEffects(On.RoR2.CharacterBody.orig_UpdateAllTemporaryVisualEffects orig, CharacterBody self)
+            {
+                orig(self);
+
+                var er = self.GetComponent<EliteReworksTemporaryVisualEffectInstances>();
+                if (!er) er = self.gameObject.AddComponent<EliteReworksTemporaryVisualEffectInstances>();
+
+                bool hasReviveBuff = self.HasBuff(Assets.Buffs.CelestineReviveBuff);
+                if (!hasReviveBuff)
+                {
+                    self.UpdateSingleTemporaryVisualEffect(ref er.celestineBuffMarkerInstance, Assets.NonCatalogEffects.CelestineMarkerRed, self.radius, false);
+                    self.UpdateSingleTemporaryVisualEffect(ref er.celestineOwnerMarkerInstance, Assets.NonCatalogEffects.CelestineMarkerGreen, self.radius, false);
+                }
+                else
+                {
+                    bool isGhost = self.inventory && self.inventory.GetItemCountPermanent(RoR2Content.Items.Ghost) > 0;
+                    self.UpdateSingleTemporaryVisualEffect(ref er.celestineBuffMarkerInstance, Assets.NonCatalogEffects.CelestineMarkerRed, self.radius, isGhost);
+                    self.UpdateSingleTemporaryVisualEffect(ref er.celestineOwnerMarkerInstance, Assets.NonCatalogEffects.CelestineMarkerGreen, self.radius, !isGhost);
+                }
+            }
+
+            private static void CreateCelestineMarkerGreenMat()
+            {
+                if (Materials.CelestineBuffMarkerMat) return;
+                Material original = Addressables.LoadAssetAsync<Material>("RoR2/Base/WardOnLevel/matWarbannerBuffBillboard.mat").WaitForCompletion();
+
+                Material mat = new Material(original);
+                mat.SetColor("_TintColor", new Color32(0, 200, 140, 255));
+
+                Materials.CelestineBuffMarkerMat = mat;
+            }
+
+            private static void CreateCelestineMarkerRedMat()
+            {
+                if (Materials.CelestineOwnerMarkerMat) return;
+                Material original = Addressables.LoadAssetAsync<Material>("RoR2/Base/WardOnLevel/matWarbannerBuffBillboard.mat").WaitForCompletion();
+
+                Material mat = new Material(original);
+                mat.SetColor("_TintColor", new Color32(200, 0, 40, 255));
+
+                Materials.CelestineOwnerMarkerMat = mat;
             }
 
             private static void CreateCelestineIndicatorNoBubble()
@@ -187,51 +275,85 @@ namespace EliteReworks2.Elites.Celestine
                 Materials.CelestineIndicatorNoBubble = mat;
             }
 
+            private static void CreateCelestineMarkerGreen()
+            {
+                if (NonCatalogEffects.CelestineMarkerGreen) return;
+                GameObject effect = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/WardOnLevel/WarbannerBuffEffect.prefab").WaitForCompletion().InstantiateClone("MoffeinEliteReworks_CelestineBuffEffect", false);
+
+                Transform visual = effect.transform.Find("Visual");
+                Transform flare = visual.Find("FlarePerst_Ps (1)");
+                {
+                    ParticleSystem ps = flare.GetComponent<ParticleSystem>();
+                    var main = ps.main;
+                    main.startColor = new ParticleSystem.MinMaxGradient(new Color32(0, 188, 131, 255), new Color32(102, 255, 179, 255));
+                }
+                Transform softGlow = visual.Find("SoftGlow");
+                {
+                    ParticleSystem ps = softGlow.GetComponent<ParticleSystem>();
+                    ps.startColor = new Color32(0, 200, 140, 93);
+                }
+                Transform pulse = visual.Find("PulseEffect, Ring");
+                {
+                    ParticleSystemRenderer psr = pulse.GetComponent<ParticleSystemRenderer>();
+                    psr.material = Materials.CelestineBuffMarkerMat;
+                }
+
+                //PluginContentPack.effectDefs.Add(new EffectDef(effect));
+                NonCatalogEffects.CelestineMarkerGreen = effect;
+            }
+
+            private static void CreateCelestineMarkerRed()
+            {
+                if (NonCatalogEffects.CelestineMarkerRed) return;
+                GameObject effect = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/WardOnLevel/WarbannerBuffEffect.prefab").WaitForCompletion().InstantiateClone("MoffeinEliteReworks_CelestineOwnerEffect", false);
+
+                Transform visual = effect.transform.Find("Visual");
+                Transform flare = visual.Find("FlarePerst_Ps (1)");
+                {
+                    ParticleSystem ps = flare.GetComponent<ParticleSystem>();
+                    var main = ps.main;
+                    main.startColor = new ParticleSystem.MinMaxGradient(new Color32(188, 0, 38, 255), new Color32(255, 90, 179, 255));
+                }
+                Transform softGlow = visual.Find("SoftGlow");
+                {
+                    ParticleSystem ps = softGlow.GetComponent<ParticleSystem>();
+                    ps.startColor = new Color32(200, 0, 40, 93);
+                }
+                Transform pulse = visual.Find("PulseEffect, Ring");
+                {
+                    ParticleSystemRenderer psr = pulse.GetComponent<ParticleSystemRenderer>();
+                    psr.material = Materials.CelestineOwnerMarkerMat;
+                }
+
+                //PluginContentPack.effectDefs.Add(new EffectDef(effect));
+                NonCatalogEffects.CelestineMarkerRed = effect;
+            }
+
             #region revive
             private static void CreateReviveBuff()
             {
-                if (Buffs.ReviveBuff) return;
+                if (Buffs.CelestineReviveBuff) return;
 
                 BuffDef buff = ScriptableObject.CreateInstance<BuffDef>();
                 buff.buffColor = new Color(157f / 255f, 221f / 255f, 216f / 255f);
                 buff.canStack = false;
                 buff.isDebuff = false;
+                buff.isCooldown = false;
                 buff.iconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/DeathMark/texBuffDeathMarkIcon.tif").WaitForCompletion();
                 (buff as ScriptableObject).name = "MoffeinEliteReworks_HauntedReviveBuff";
                 PluginContentPack.buffDefs.Add(buff);
-                Buffs.ReviveBuff = buff;
+                Buffs.CelestineReviveBuff = buff;
 
                 //These hooks are complicated, don't bother setting them up if the rework isn't being used.
                 if (!useRework) return;
                 On.EntityStates.Gup.BaseSplitDeath.OnEnter += FixGhostGupSplit;
                 On.RoR2.GlobalEventManager.OnCharacterDeath += ReviveAsGhost;
-                IL.RoR2.CharacterModel.UpdateOverlays += ReviveBuffOverlay;
-            }
-
-            private static void ReviveBuffOverlay(ILContext il)
-            {
-                ILCursor c = new ILCursor(il);
-                if (c.TryGotoNext(
-                     x => x.MatchLdsfld(typeof(RoR2Content.Buffs), "FullCrit")
-                    ))
-                {
-                    c.Index += 2;
-                    c.Emit(OpCodes.Ldarg_0);
-                    c.EmitDelegate<Func<bool, CharacterModel, bool>>((hasBuff, self) =>
-                    {
-                        return hasBuff || (self.body.HasBuff(Buffs.ReviveBuff));
-                    });
-                }
-                else
-                {
-                    Debug.LogError("EliteReworks: AffixHaunted ReviveBuff UpdateOverlays IL hook failed.");
-                }
             }
 
             private static void FixGhostGupSplit(On.EntityStates.Gup.BaseSplitDeath.orig_OnEnter orig, EntityStates.Gup.BaseSplitDeath self)
             {
                 orig(self);
-                if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(Assets.Buffs.ReviveBuff))
+                if (NetworkServer.active && self.characterBody && self.characterBody.HasBuff(Assets.Buffs.CelestineReviveBuff))
                 {
                     self.hasDied = true;
                     self.DestroyBodyAsapServer();
@@ -242,7 +364,7 @@ namespace EliteReworks2.Elites.Celestine
             {
                 orig(self, damageReport);
                 if (damageReport.victimBody
-                    && damageReport.victimBody.HasBuff(Buffs.ReviveBuff)
+                    && damageReport.victimBody.HasBuff(Buffs.CelestineReviveBuff)
                     && !damageReport.victimBody.disablingHurtBoxes
                     && !damageReport.victimBody.HasBuff(RoR2Content.Buffs.AffixHaunted))
                 {

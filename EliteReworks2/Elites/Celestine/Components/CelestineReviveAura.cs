@@ -1,4 +1,5 @@
-﻿using RoR2;
+﻿using EntityStates.AffixVoid;
+using RoR2;
 using RoR2.Orbs;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace EliteReworks2.Elites.Celestine.Components
             return (characterBody && characterBody.isChampion) ? maxAttachedGhosts + championBonusAttachedGhosts : maxAttachedGhosts;
         }
 
-        public int GetCurrentGhosts()
+        public int GetCurrentAttached()
         {
             return attachedGhosts.Count + attachedAliveMonsters.Count;
         }
@@ -62,8 +63,8 @@ namespace EliteReworks2.Elites.Celestine.Components
 
             if (!NetworkServer.active) return;
 
-            ValidateBodyList(attachedGhosts);
-            ValidateBodyList(attachedAliveMonsters);
+            attachedGhosts = ValidateBodyList(attachedGhosts);
+            attachedAliveMonsters = ValidateBodyList(attachedAliveMonsters);
 
             stopwatch += Time.fixedDeltaTime;
             if (!PassiveIsActive())
@@ -105,60 +106,79 @@ namespace EliteReworks2.Elites.Celestine.Components
         {
             if (!NetworkServer.active || !characterBody || !characterBody.teamComponent) return;
 
-            int slotsRemaining = GetMaxGhosts() - GetCurrentGhosts();
-            if (slotsRemaining <= 0) return;
-
-            //Seek out new minions
-            float radiusSquare = wardRadius * wardRadius;
-            TeamIndex ti = characterBody.teamComponent.teamIndex;
-
-            //Prioritize buffing the strongest monsters
-            var teamMembers = TeamComponent.GetTeamMembers(ti).ToArray();
-            Array.Sort(teamMembers, (t1, t2) =>
+            //Detach far monsters
+            float detachSqr = detachRadius * detachRadius;
+            List<CharacterBody> toDetach = new List<CharacterBody>();
+            foreach (CharacterBody cb in attachedAliveMonsters)
             {
-                float t1Health = Mathf.NegativeInfinity;
-                if (t1 && t1.body)
+                if ((cb.corePosition-transform.position).sqrMagnitude > detachSqr)
                 {
-                    t1Health = t1.body.maxHealth;
+                    toDetach.Add(cb);
                 }
-
-                float t2Health = Mathf.NegativeInfinity;
-                if (t2 && t2.body)
-                {
-                    t2Health = t2.body.maxHealth;
-                }
-
-                if (t1Health == t2Health)
-                {
-                    return 0;
-                }
-                else if (t1Health > t2Health)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return -1;
-                }
-            });
-
-            foreach (TeamComponent tc in teamMembers)
+            }
+            foreach(CharacterBody cb in toDetach)
             {
-                if (tc.body
-                    && (tc.body.bodyFlags & CharacterBody.BodyFlags.Masterless) != CharacterBody.BodyFlags.Masterless
-                    && !tc.body.disablingHurtBoxes
-                    && tc.body.healthComponent && tc.body.healthComponent.alive
-                    && !tc.body.HasBuff(RoR2Content.Buffs.AffixHaunted) && !tc.body.HasBuff(Celestine.Assets.Buffs.ReviveBuff))
+                attachedAliveMonsters.Remove(cb);
+                cb.ClearTimedBuffs(Celestine.Assets.Buffs.CelestineReviveBuff);
+            }
+
+            int slotsRemaining = GetMaxGhosts() - GetCurrentAttached();
+            if (slotsRemaining > 0)
+            {
+                //Seek out new minions
+                float radiusSquare = wardRadius * wardRadius;
+                TeamIndex ti = characterBody.teamComponent.teamIndex;
+
+                //Prioritize buffing the strongest monsters
+                var teamMembers = TeamComponent.GetTeamMembers(ti).ToArray();
+                Array.Sort(teamMembers, (t1, t2) =>
                 {
-                    float squareDist = (transform.position - tc.body.corePosition).sqrMagnitude;
-                    if (squareDist <= radiusSquare)
+                    float t1Health = Mathf.NegativeInfinity;
+                    if (t1 && t1.body)
                     {
-                        attachedAliveMonsters.Add(tc.body);
+                        t1Health = t1.body.maxHealth;
+                    }
 
-                        slotsRemaining--;
-                        if (slotsRemaining <= 0)
+                    float t2Health = Mathf.NegativeInfinity;
+                    if (t2 && t2.body)
+                    {
+                        t2Health = t2.body.maxHealth;
+                    }
+
+                    if (t1Health == t2Health)
+                    {
+                        return 0;
+                    }
+                    else if (t1Health > t2Health)
+                    {
+                        //Higher max health goes at the start of the list
+                        return -1;
+                    }
+                    else
+                    {
+                        return 1;
+                    }
+                });
+
+                foreach (TeamComponent tc in teamMembers)
+                {
+                    if (tc.body
+                        && (tc.body.bodyFlags & CharacterBody.BodyFlags.Masterless) != CharacterBody.BodyFlags.Masterless
+                        && !tc.body.disablingHurtBoxes
+                        && tc.body.healthComponent && tc.body.healthComponent.alive
+                        && !tc.body.HasBuff(RoR2Content.Buffs.AffixHaunted) && !tc.body.HasBuff(Celestine.Assets.Buffs.CelestineReviveBuff)
+                        && !attachedGhosts.Contains(tc.body) && !attachedAliveMonsters.Contains(tc.body))
+                    {
+                        float squareDist = (transform.position - tc.body.corePosition).sqrMagnitude;
+                        if (squareDist <= radiusSquare)
                         {
-                            break;
+                            attachedAliveMonsters.Add(tc.body);
+
+                            slotsRemaining--;
+                            if (slotsRemaining <= 0)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
@@ -167,7 +187,7 @@ namespace EliteReworks2.Elites.Celestine.Components
             //Refresh timed buff on attached alive monsters
             foreach (CharacterBody body in attachedAliveMonsters)
             {
-                body.AddTimedBuff(Celestine.Assets.Buffs.ReviveBuff, refreshTime + 0.2f);
+                body.AddTimedBuff(Celestine.Assets.Buffs.CelestineReviveBuff, refreshTime + 0.2f);
             }
         }
 
@@ -176,7 +196,7 @@ namespace EliteReworks2.Elites.Celestine.Components
             if (!NetworkServer.active) return;
             foreach(CharacterBody body in attachedAliveMonsters)
             {
-                body.ClearTimedBuffs(Celestine.Assets.Buffs.ReviveBuff);
+                body.ClearTimedBuffs(Celestine.Assets.Buffs.CelestineReviveBuff);
             }
             attachedAliveMonsters.Clear();
         }
@@ -192,8 +212,8 @@ namespace EliteReworks2.Elites.Celestine.Components
                 {
                     origin = body.corePosition,
                     target = characterBody.mainHurtBox,
-                    timeToArrive = 1f + indexInGroup * 0.1f,
-                    scale = 1f
+                    timeToArrive = 0.5f + indexInGroup * 0.1f,
+                    scale = 0.5f
                 });
                 indexInGroup++;
             }
@@ -205,16 +225,16 @@ namespace EliteReworks2.Elites.Celestine.Components
                 {
                     origin = body.corePosition,
                     target = characterBody.mainHurtBox,
-                    timeToArrive = 1f + indexInGroup * 0.1f,
-                    scale = 1f
+                    timeToArrive = 0.5f + indexInGroup * 0.1f,
+                    scale = 0.5f
                 });
                 indexInGroup++;
             }
         }
 
-        private void ValidateBodyList(List<CharacterBody> bodyList)
+        private List<CharacterBody> ValidateBodyList(List<CharacterBody> bodyList)
         {
-            bodyList = bodyList.Where(body => body && body.healthComponent && body.healthComponent.alive).ToList();
+           return bodyList.Where(body => body && body.healthComponent && body.healthComponent.alive).ToList();
         }
     }
 }

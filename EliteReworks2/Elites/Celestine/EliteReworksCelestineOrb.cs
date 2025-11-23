@@ -6,10 +6,8 @@ namespace EliteReworks2.Elites.Celestine
 {
     public class EliteReworksCelestineOrb : RoR2.Orbs.Orb
     {
-        public static GameObject orbEffect = Addressables.LoadAssetAsync<GameObject>("RoR2/Junk/EliteHaunted/HauntOrbEffect.prefab").WaitForCompletion();
-
         public float timeToArrive;
-        public float scale;
+        public float scale = 1f;
 
         public override void Begin()
         {
@@ -21,7 +19,7 @@ namespace EliteReworks2.Elites.Celestine
                 genericFloat = base.duration
             };
             effectData.SetHurtBoxReference(this.target);
-            EffectManager.SpawnEffect(orbEffect, effectData, true);
+            EffectManager.SpawnEffect(Celestine.Assets.Effects.CelestineOrb, effectData, true);
         }
     }
 }
