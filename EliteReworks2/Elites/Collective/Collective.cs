@@ -1,5 +1,5 @@
 ﻿using BepInEx.Configuration;
-using EliteReworks2.Elites.Collective.Components;
+using EliteReworks2.Common;
 using RoR2;
 using System;
 using System.Collections.Generic;
@@ -62,20 +62,15 @@ namespace EliteReworks2.Elites.Collective
         private void StunnableShield()
         {
             if (!stunDisablesShield) return;
-            On.RoR2.CharacterBody.OnClientBuffsChanged += CharacterBody_OnClientBuffsChanged;
+            On.RoR2.AffixCollectiveAttachmentBehaviour.FixedUpdate += AffixCollectiveAttachmentBehaviour_FixedUpdate;
         }
 
-        private void CharacterBody_OnClientBuffsChanged(On.RoR2.CharacterBody.orig_OnClientBuffsChanged orig, CharacterBody self)
+        private void AffixCollectiveAttachmentBehaviour_FixedUpdate(On.RoR2.AffixCollectiveAttachmentBehaviour.orig_FixedUpdate orig, AffixCollectiveAttachmentBehaviour self)
         {
             orig(self);
-            if (NetworkServer.active && self.HasBuff(DLC3Content.Buffs.EliteCollective))
+            if (NetworkServer.active && self.attachment && self.attachment.attachedBody && self.attachment.attachedBody.HasBuff(Buffs.DisablePassiveEffect))
             {
-                var component = self.GetComponent<CollectiveShieldManagerServer>();
-                if (!component)
-                {
-                    component = self.gameObject.AddComponent<CollectiveShieldManagerServer>();
-                    component.characterBody = self;
-                }
+                if (self.colliderDisableTimer < 1.5f) self.colliderDisableTimer = 1.5f;
             }
         }
     }
