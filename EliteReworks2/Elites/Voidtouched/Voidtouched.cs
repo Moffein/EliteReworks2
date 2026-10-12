@@ -19,6 +19,7 @@ namespace EliteReworks2.Elites.Voidtouched
 
         public static bool useRework;
         public static bool reworkBuffNullify;
+        public static bool normalizeCollapse;
 
         public float collapseBodyDamageBase = 12f*0.7f;  //Lemurian
         public float collapseBossBodyDamageBase = 16f * 0.7f;  //Imp Overlord
@@ -26,7 +27,8 @@ namespace EliteReworks2.Elites.Voidtouched
         protected override void ReadConfig(ConfigFile config)
         {
             base.ReadConfig(config);
-            useRework = config.Bind<bool>(new ConfigDefinition(ConfigCategoryString, "Rework - Nullify on Hit"), true, new ConfigDescription("Attacks apply Nullify instead of Collapse.")).Value;
+            normalizeCollapse = config.Bind<bool>(new ConfigDefinition(ConfigCategoryString, "Normalize Collapse Damage"), true, new ConfigDescription("Makes Collapse damage consistent across enemy types.")).Value;
+            useRework = config.Bind<bool>(new ConfigDefinition(ConfigCategoryString, "Rework - Nullify on Hit"), false, new ConfigDescription("Attacks apply Nullify instead of Collapse.")).Value;
             reworkBuffNullify = config.Bind<bool>(new ConfigDefinition(ConfigCategoryString, "Rework - Buff Nullify"), true, new ConfigDescription("Requires Rework - Nullify on Hit. Nullify only takes 2 stacks to root.")).Value;
         }
 
@@ -40,7 +42,8 @@ namespace EliteReworks2.Elites.Voidtouched
                 On.RoR2.GlobalEventManager.ServerDamageDealt += GlobalEventManager_ServerDamageDealt;
                 RecalculateStatsAPI.GetStatCoefficients += AdjustVanillaVoidEliteStats;
             }
-            else
+
+            if (normalizeCollapse)
             {
                 IL.RoR2.GlobalEventManager.ProcessHitEnemy += NormalizeCollapseDamage;
             }
@@ -122,6 +125,7 @@ namespace EliteReworks2.Elites.Voidtouched
                             {
                                 //Enemies need to scale
                                 float ambientDamageStat = EliteReworks2Utils.GetAmbientLevelScaledDamage(attackerBody.isChampion ? collapseBossBodyDamageBase : collapseBodyDamageBase);
+
                                 if (attackerBody.damage > ambientDamageStat)
                                 {
                                     return damageMult * (ambientDamageStat / attackerBody.damage);

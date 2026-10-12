@@ -206,40 +206,43 @@ namespace EliteReworks2.Elites.Malachite
 
             private static void MalachiteBuildupBehavior(On.RoR2.CharacterBody.orig_AddTimedBuff_BuffDef_float orig, CharacterBody self, BuffDef buffDef, float duration)
             {
-                if (buffDef == Buffs.MalachiteBuildup)
+                if (self.healthComponent && self.healthComponent.alive)
                 {
-                    //If already HealingDisabled, extend it and make sure there are no remaining MalachiteBuildup
-                    if (self.HasBuff(RoR2Content.Buffs.HealingDisabled))
+                    if (buffDef == Buffs.MalachiteBuildup)
                     {
-                        self.ClearTimedBuffs(Buffs.MalachiteBuildup);
-                        orig(self, RoR2Content.Buffs.HealingDisabled, duration);
-                        return;
-                    }
-
-                    int currentBuffCount = self.GetBuffCount(Buffs.MalachiteBuildup);
-                    if (currentBuffCount < 4)
-                    {
-                        //Refresh stack duration when building up
-                        if (currentBuffCount > 0)
+                        //If already HealingDisabled, extend it and make sure there are no remaining MalachiteBuildup
+                        if (self.HasBuff(RoR2Content.Buffs.HealingDisabled))
                         {
-                            foreach(TimedBuff t in self.timedBuffs)
+                            self.ClearTimedBuffs(Buffs.MalachiteBuildup);
+                            orig(self, RoR2Content.Buffs.HealingDisabled, duration);
+                            return;
+                        }
+
+                        int currentBuffCount = self.GetBuffCount(Buffs.MalachiteBuildup);
+                        if (currentBuffCount < 4)
+                        {
+                            //Refresh stack duration when building up
+                            if (currentBuffCount > 0)
                             {
-                                if (t.buffIndex != Buffs.MalachiteBuildup.buffIndex) continue;
-                                if (t.timer < duration) t.timer = duration;
+                                foreach (TimedBuff t in self.timedBuffs)
+                                {
+                                    if (t.buffIndex != Buffs.MalachiteBuildup.buffIndex) continue;
+                                    if (t.timer < duration) t.timer = duration;
+                                }
                             }
                         }
+                        else
+                        {
+                            //Convert to real HealingDisabled at 5 stacks
+                            self.ClearTimedBuffs(Buffs.MalachiteBuildup);
+                            orig(self, RoR2Content.Buffs.HealingDisabled, duration);
+                            return;
+                        }
                     }
-                    else
+                    else if (buffDef == RoR2Content.Buffs.HealingDisabled)
                     {
-                        //Convert to real HealingDisabled at 5 stacks
                         self.ClearTimedBuffs(Buffs.MalachiteBuildup);
-                        orig(self, RoR2Content.Buffs.HealingDisabled, duration);
-                        return;
                     }
-                }
-                else if (buffDef == RoR2Content.Buffs.HealingDisabled)
-                {
-                    self.ClearTimedBuffs(Buffs.MalachiteBuildup);
                 }
 
                 orig(self, buffDef, duration);
