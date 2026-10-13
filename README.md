@@ -55,19 +55,25 @@ All players need the mod.
 			- Ghosts lose their Elite bonuses.
 		- Killing a Celestine kills all their attached ghosts.
 	
+	- DLC4's Stygian Elites seem to do the same thing as this, but they're locked to a very specific set of content, so I'm just leaving this rework enabled by default.
+	
 	*Instead of covering the map in ugly gimmicky bubbles, Celestines now buff their teammates and make them more aggressive, and will keep them in the fight even if they are killed.*
 
 - **Mending:**
 	- Stun/Shock/Freeze/Bag disables healing.
 	
 - **Voidtouched:**
-	- Rework: Collapse replaced with Void Reaver Nullify
+	- Enemy Collapse Damage is now normalized, so that it is consistent between enemies.
+		
+		*Vanilla Collapse suffers from the same issue as Early Access Blazing where it scales off of enemy base damage, leading to cheap instakills. This change makes it a lot more fair and predictable.*
+
+	- Rework: Collapse replaced with Void Reaver Nullify **(Disabled by Default)**
 		- 1 stack per hit
 		- Lasts 8s (scales with proc coefficient)
 		- Now only takes 2 stacks to root.
 		- Gains a damage bonus instead of the damage penalty that Vanilla has.
-	
-	*Vanilla Collapse suffers from the same issue as Early Access Blazing where it scales off of enemy base damage, leading to cheap instakills.*
+		
+		*The original reason behind the rework was because I wasn't good enough at IL Hooking to fix the damage during SotV-era RoR2. I've been playing with the Collapse Damage Normalization since the mod's rewrite during Alloyed Collective's release, and I'm confident in having that be the default instead now.*
 	
 - **Gilded:**
 	- Spike damage now scales based on level, instead of damage.
