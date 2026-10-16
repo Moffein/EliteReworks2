@@ -19,7 +19,7 @@ namespace EliteReworks2
     [BepInDependency(R2API.DamageAPI.PluginGUID)]
     [BepInDependency(R2API.EliteAPI.PluginGUID)]
     [BepInDependency("com.TPDespair.ZetAspects", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin(EliteReworks2Plugin.pluginGUID, EliteReworks2Plugin.pluginName, "2.1.0")]
+    [BepInPlugin(EliteReworks2Plugin.pluginGUID, EliteReworks2Plugin.pluginName, "2.1.1")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
 
     public class EliteReworks2Plugin : BaseUnityPlugin

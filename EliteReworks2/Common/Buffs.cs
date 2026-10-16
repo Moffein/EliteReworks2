@@ -39,6 +39,26 @@ namespace EliteReworks2.Common
             On.EntityStates.FrozenState.OnExit += FrozenState_OnExit;
             On.EntityStates.Drifter.Bag.BaggedObject.OnEnter += BaggedObject_OnEnter;
             On.EntityStates.Drifter.Bag.BaggedObject.OnExit += BaggedObject_OnExit;
+            On.RoR2.MedusaShardBehavior.FreezeCharacter += MedusaShardBehavior_FreezeCharacter;
+            On.RoR2.MedusaShardBehavior.UnfreezeCharacter += MedusaShardBehavior_UnfreezeCharacter;
+        }
+
+        private static void MedusaShardBehavior_UnfreezeCharacter(On.RoR2.MedusaShardBehavior.orig_UnfreezeCharacter orig, MedusaShardBehavior self)
+        {
+            orig(self);
+            if (NetworkServer.active && self.body)
+            {
+                self.body.AddBuff(DisablePassiveEffect);
+            }
+        }
+
+        private static void MedusaShardBehavior_FreezeCharacter(On.RoR2.MedusaShardBehavior.orig_FreezeCharacter orig, MedusaShardBehavior self)
+        {
+            orig(self);
+            if (NetworkServer.active && self.body)
+            {
+                self.body.RemoveBuff(DisablePassiveEffect);
+            }
         }
 
         private static void StunState_OnEnter(On.EntityStates.StunState.orig_OnEnter orig, EntityStates.StunState self)
