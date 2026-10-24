@@ -1,4 +1,5 @@
 ﻿using BepInEx.Configuration;
+using R2API;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -23,6 +24,8 @@ namespace EliteReworks2.Elites.Blazing
         public static float healthBoostCoefficientHonor;
         public static float damageBoostCoefficientHonor;
 
+        public static bool enableSpeedBoost;
+
         protected override void ReadConfig(ConfigFile config)
         {
             base.ReadConfig(config);
@@ -31,6 +34,16 @@ namespace EliteReworks2.Elites.Blazing
 
             healthBoostCoefficientHonor = config.Bind<float>(new ConfigDefinition(ConfigCategoryString, "Stats (Honor) - Health Multiplier"), 2.5f, new ConfigDescription("Health multiplier for this Elite Type when Honor is enabled. (Vanilla = 2.5)")).Value;
             damageBoostCoefficientHonor = config.Bind<float>(new ConfigDefinition(ConfigCategoryString, "Stats (Honor) - Damage Multiplier"), 1.5f, new ConfigDescription("Damage multiplier for this Elite Type when Honor is enabled. (Vanilla = 1.5)")).Value;
+        
+            enableSpeedBoost = config.Bind<bool>(new ConfigDefinition(ConfigCategoryString, "Experimental - Passive Speed Boost"), false, new ConfigDescription("Gives Blazing enemies a passive move speed boost.")).Value;
+        }
+
+        private void RecalculateStatsAPI_GetStatCoefficients(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
+        {
+            if (sender.HasBuff(RoR2Content.Buffs.AffixRed))
+            {
+                args.moveSpeedMultAdd += 0.25f;
+            }
         }
 
         protected override void ApplyChanges()
@@ -38,6 +51,11 @@ namespace EliteReworks2.Elites.Blazing
             base.ApplyChanges();
             ModifyStats();
             On.RoR2.CharacterBody.UpdateFireTrail += ModifyFireTrail;
+
+            if (enableSpeedBoost)
+            {
+                RecalculateStatsAPI.GetStatCoefficients += RecalculateStatsAPI_GetStatCoefficients;
+            }
         }
 
         private void ModifyStats()
