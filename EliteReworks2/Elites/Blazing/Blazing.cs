@@ -35,7 +35,7 @@ namespace EliteReworks2.Elites.Blazing
             healthBoostCoefficientHonor = config.Bind<float>(new ConfigDefinition(ConfigCategoryString, "Stats (Honor) - Health Multiplier"), 2.5f, new ConfigDescription("Health multiplier for this Elite Type when Honor is enabled. (Vanilla = 2.5)")).Value;
             damageBoostCoefficientHonor = config.Bind<float>(new ConfigDefinition(ConfigCategoryString, "Stats (Honor) - Damage Multiplier"), 1.5f, new ConfigDescription("Damage multiplier for this Elite Type when Honor is enabled. (Vanilla = 1.5)")).Value;
         
-            enableSpeedBoost = config.Bind<bool>(new ConfigDefinition(ConfigCategoryString, "Experimental - Passive Speed Boost"), false, new ConfigDescription("Gives Blazing enemies a passive move speed boost.")).Value;
+            enableSpeedBoost = config.Bind<bool>(new ConfigDefinition(ConfigCategoryString, "Passive Speed Boost"), true, new ConfigDescription("Gives Blazing enemies a passive move speed boost.")).Value;
         }
 
         private void RecalculateStatsAPI_GetStatCoefficients(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)

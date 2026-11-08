@@ -37,6 +37,7 @@ All players need the mod.
 - **Blazing:**
 	- Fire trails damage now scales based on level, instead of damage.
 	- Stun/Shock/Freeze/Bag disables the passive fire trail.
+	- +25% move speed, to synergize with the fire trail.
 	
 	*Fire trails are very unpredictable due to being scaled off of enemy damage. Some enemies won't do much damage, while others will melt you in a few ticks. This change makes Blazing trails consistent across all enemies, which should make them more predictable to fight as melee characters.*
 
